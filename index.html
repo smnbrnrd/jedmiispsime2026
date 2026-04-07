@@ -25,16 +25,17 @@
                     <img src="assets/logos/logo_litis.png" class="logo" alt="logo_litis">
                     <img src="assets/logos/logo_normastic.png" class="logo" alt="logo_normastic">
                 </div>
+                <p class="mt-5">Slides available at <a href="https://smnbrnrd.github.io/jedmiispsime2026/">smnbrnrd.github.io/jedmiispsime2026</a>.</p>
             </section>
 
             <!--------------------------------------------->
             <section class="section-slide">
-                <div class="title">Today's artificial intelligence is deep learning</div>
+                <div class="title">Today's AI is deep learning</div>
             </section>
 
             <!--------------------------------------------->
             <section>
-                <h1>AI: historical perspective</h1>
+                <h1>Artificial Intelligence: historical perspective</h1>
                 <div class="fig-container" data-file="assets/html/ai-timeline.html" 
                         data-style="width:100%; align:center; height:100%" 
                         style="height: 100%" data-preload 
@@ -125,7 +126,7 @@
             <!--------------------------------------------->
             <section>
                 <h1>Deep Neural Networks</h1>
-                <h2>DNN are around for 60 years, so why is it working now?</h2>
+                <h2>DNN have been around for 60 years, so why is it working now?</h2>
                 <div class="row mt-3">
                     <div class="col-50 center">
                         <div class="mb-2 strong">Abundance of data</div>
@@ -151,7 +152,7 @@
             <!--------------------------------------------->
             <section>
                 <h1>Example: representation learning for images/videos</h1>
-                <h2>Image/video analysis: <span class="important">Convolutional NN</span> + <span class="alert">regular NN</span></h2>
+                <h2>Image/video analysis: <span class="important">Convolutional NN</span> + <span class="alert">fully connected NN</span></h2>
                 <figure class="center mt-4">
                     <img src="assets/images/cnn_fidle.png" class="w-70">
                     <figcaption class="right w-10">source: <a href="https://www.fidle.cnrs.fr">https://www.fidle.cnrs.fr</a></figcaption>
@@ -385,7 +386,7 @@
                         <ul>
                             <li>Traditional solvers based on numerical methods</li>
                             <li><span class="important">Limitations: high computational cost</span><br>
-                            Can takes weeks of HPC time for a single simulation
+                            Can take weeks of HPC time for a single simulation
                             </li>
                             <li><span class="important">One simulation per configuration:</span></li>
                             <ul>
@@ -478,6 +479,7 @@
                                 \mathcal{L}(\boldsymbol{\theta}) = \mathcal{L}_{data}(\boldsymbol{\theta}) + \lambda \mathcal{L}_{physics}(\boldsymbol{\theta})
                             \]
                             where $\mathcal{L}_{data}$ is the data-driven loss, $\mathcal{L}_{physics}$ is the physics-driven loss</li>
+                            <li>$\mathcal{L}_{physics}(\boldsymbol{\theta})$ works as a regularization term to enforce physical constraints</li>
                             <li class="mt-3">Examples:</li>
                             <ul>
                                 <li><span class="important">Physics-Informed Neural Networks</span> (details to follow)</li>
@@ -545,6 +547,34 @@
                 </div>
             </section>
 
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>2. Scientific knowledge into the learning process</h1>
+                <div class="row">
+                    <div class="col-85 mt-3">
+                        <p class="important strong">Physics-Informed Neural Network (<a href="https://maziarraissi.github.io/PINNs/">Raissi et al., 2019</a>)</p>
+                        <p>Several important limitations:</p>
+                        <ul>
+                            <li><span class="important strong">Hard to train</span><br>
+                            The "data" et "physics" terms are difficult to balance during training, leading to convergence issues</li>
+                            <li><span class="important strong">Poor performance for large temporal and spatial scales</span><br>
+                            Usually fail to capture long-term temporal dynamics and large spatial domain needs very deep networks and a huge amount of collocation points</li>
+                            <li><span class="important strong">High computational cost</span><br>
+                            Training PINNs can be computationally expensive, especially for large-scale problems</li>
+                            <li><span class="important strong">Fail to capture multi-scale dynamics</span><br>
+                            Many spatio-temporal phenomena exhibit behavior across multiple scales, which is challenging for PINNs to capture accurately</li>
+                            <li><span class="important strong">Limited generalization ability</span><br>
+                            Models may not generalize well to unseen regions or different parameter values</li>
+                            <li><span class="important strong">Lack of theoretical guarantees</span><br>
+                            No theoretical guarantees on convergence or generalization</li>
+                        </ul>
+                    </div>
+                    <div class="col-15"><figure><img src="assets/images/sciml_approach1.png" class="w-100"></figure></div>
+                </div>
+
+            </section>
+
             <!------------------------------------------------------>
             <section>
                 <h1>3. Architectural modifications</h1>
@@ -552,7 +582,7 @@
                     <div class="col-85 mt-3">
                         <p class="important strong">Key idea: modify the architecture of ML models to respect scientific principles</p>
                         <ul>
-                            <li>Most representative approaches are Neural Operators</li>
+                            <li>Most representative approaches are Neural Operators (<a href="https://www.jmlr.org/papers/volume24/21-1524/21-1524.pdf" target="_blank">Kovachki et al., 2023</a>)</li>
                             <li>Let $\mathcal{A}$ and $\mathcal{U}$ denote the spaces of input and output functions, respectively</li>
                             <li>NO learn a mapping $\mathcal{G} : \mathcal{A} \to \mathcal{U}$ that respects the underlying physics</li>
                         </ul>
@@ -603,10 +633,29 @@
             <!------------------------------------------------------>
             <section>
                 <h1>Fifty shades of Neural Operators</h1>
-                <figure class="center">
-                    <img src="assets/images/dl4cfd_jungle.png" class="w-50">
-                    <figcaption><a href="https://arxiv.org/pdf/2408.12171" target="_blank">Wang et al. ,"Recent Advances on Machine Learning for Computational Fluid Dynamics: A Survey", 2025</a></figcaption>
-                </figure>
+                <h2>Many problems, many methods...</h2>
+                <div class="row">
+                    <div class="col-52">
+                        <p>$a \in \mathcal{A}$ and $u \in \mathcal{U}$ can be respectively:</p>
+                        <ul>
+                            <li>An initial condition and a solution for a time dependent PDE</li>
+                            <figure>
+                                <img src="assets/images/fno_zeroshotsuperresolution.png" class="w-90">
+                            </figure>
+                            <li>A parameter function and a solution for a time independent PDE</li>
+
+                            <figure>
+                                <img src="assets/images/fno_darcy_pred.png" class="w-90">
+                            </figure>
+                        </ul>
+                    </div>
+                    <div class="col-48 p-1">
+                        <figure class="center">
+                            <img src="assets/images/dl4cfd_jungle.png" class="w-95">
+                            <figcaption><a href="https://arxiv.org/pdf/2408.12171" target="_blank">Wang et al. ,"Recent Advances on Machine Learning for Computational Fluid Dynamics: A Survey", 2025</a></figcaption>
+                        </figure>
+                    </div>
+                </div>
             </section>
 
             <!--------------------------------------------->
