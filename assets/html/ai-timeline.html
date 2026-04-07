@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <script src="d3.v7.min.js"></script>
+  <style>
+    body { display: flex; justify-content: center; align-items: start; min-height: 100vh; margin: 0; }
+  </style>
+</head>
+<body>
+<script>
+  const width = 1000;
+  const height = 560;
+  const margin = { top: 30, right: 40, bottom: 80, left: 40 };
+  const graphWidth  = width  - margin.left - margin.right;
+  const graphHeight = height - margin.top  - margin.bottom - 20; // extra space for caption
+
+  const svg = d3.select("body").append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", [0, 0, width, height])
+    .style("display", "block");
+    //.style("margin", "auto");
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  const startDate = new Date("1950-01-01");
+  const endDate   = new Date("2040-01-01");
+
+  const x = d3.scaleUtc()
+    .domain([startDate, endDate])
+    .range([0, graphWidth]);
+
+  /* ── Eras ── */
+  const eras = [
+    {
+      label: "Artificial Intelligence",
+      sub: "Machines mimicking human intelligence",
+      start: "1950-01-01",
+      color: { fill: "#EAF3DE", stroke: "#3B6D11", text: "#27500A", sub: "#3B6D11" },
+      top: 0,
+      height: graphHeight * 0.65,
+    },
+    {
+      label: "Machine Learning",
+      sub: "Learning from data, without explicit programming",
+      start: "1980-01-01",
+      color: { fill: "#E6F1FB", stroke: "#185FA5", text: "#0C447C", sub: "#185FA5" },
+      top: graphHeight * 0.18,
+      height: graphHeight * 0.45,
+    },
+    {
+      label: "Deep Learning",
+      sub: "Deep Neural Networks at scale",
+      start: "2010-01-01",
+      color: { fill: "#EEEDFE", stroke: "#534AB7", text: "#3C3489", sub: "#534AB7" },
+      top: graphHeight * 0.36,
+      height: graphHeight * 0.25,
+    },
+  ];
+
+  eras.forEach(era => {
+    const ex = x(new Date(era.start));
+    const ew = graphWidth - ex;
+    const grp = g.append("g");
+
+    grp.append("rect")
+      .attr("x", ex)
+      .attr("y", era.top)
+      .attr("width", ew)
+      .attr("height", era.height)
+      .attr("rx", 10)
+      .attr("fill", era.color.fill)
+      .attr("stroke", era.color.stroke)
+      .attr("stroke-width", 0.8);
+
+    grp.append("text")
+      .attr("x", ex + 18)
+      .attr("y", era.top + 28)
+      .style("font-family", "Fira Sans, sans-serif")
+      .style("font-size", "1.4em")
+      .style("font-weight", "600")
+      .style("fill", era.color.text)
+      .text(era.label);
+
+    grp.append("text")
+      .attr("x", ex + 18)
+      .attr("y", era.top + 55)
+      .style("font-family", "Fira Sans, sans-serif")
+      .style("font-size", "1.2em")
+      .style("fill", era.color.sub)
+      .text(era.sub);
+
+    /* dashed connector: top-left corner of box → x-axis */
+    grp.append("line")
+      .attr("x1", ex).attr("y1", era.top + era.height)
+      .attr("x2", ex).attr("y2", graphHeight)
+      .attr("stroke", era.color.stroke)
+      .attr("stroke-width", 0.7)
+      .attr("stroke-dasharray", "4 3");
+  });
+
+  /* ── X axis ── */
+  g.append("g")
+    .attr("transform", `translate(0, ${graphHeight})`)
+    .style("font-size", "1em")
+    .style("font-family", "Fira Sans, sans-serif")
+    .call(
+      d3.axisBottom(x)
+        .tickValues([
+          new Date("1950-01-01"),
+          new Date("1960-01-01"),
+          new Date("1970-01-01"),
+          new Date("1980-01-01"),
+          new Date("1990-01-01"),
+          new Date("2000-01-01"),
+          new Date("2010-01-01"),
+          new Date("2020-01-01"),
+        ])
+        .tickFormat(d3.utcFormat("%Y"))
+    )
+    .call(axis => axis.select(".domain").attr("stroke", "#aaa"))
+    .call(axis => axis.selectAll(".tick line").attr("stroke", "#aaa"))
+    .call(axis => axis.selectAll(".tick text").style("fill", "#aaa"));
+
+  /* ── Milestones ── */
+  const milestones = [
+    { date: "1956-01-01", label: "Dartmouth conf.", color: "#3B6D11", yOffset: -120 },
+    { date: "1958-01-01", label: "Perceptron",      color: "#3B6D11", yOffset: -80 },
+    { date: "1967-01-01", label: "First Deep NN", color: "#3B6D11", yOffset: -40 },
+    { date: "1988-01-01", label: "LeNet",      color: "#185FA5", yOffset: -120 },
+    { date: "1995-01-01", label: "SVM/Random Forest", color: "#185FA5", yOffset: -80 },
+    { date: "1997-01-01", label: "Deep Blue", color: "#185FA5", yOffset: -40 },
+    { date: "2012-01-01", label: "AlexNet",         color: "#534AB7", yOffset: -120 },
+    { date: "2017-01-01", label: "Transformer",     color: "#534AB7", yOffset: -80 },
+    { date: "2022-06-01", label: "ChatGPT",         color: "#534AB7", yOffset: -40 },
+  ];
+
+  milestones.forEach(m => {
+    const mx = x(new Date(m.date));
+    const my = graphHeight + m.yOffset;
+
+    g.append("line")
+      .attr("x1", mx).attr("y1", my)
+      .attr("x2", mx).attr("y2", my - m.yOffset)
+      .attr("stroke", m.color)
+      .attr("stroke-width", 1);
+
+    g.append("circle")
+      .attr("cx", mx).attr("cy", my)
+      .attr("r", 4)
+      .attr("fill", m.color);
+
+    g.append("text")
+      .attr("x", mx + 5)
+      .attr("y", my + 12)
+      .style("font-family", "Fira Sans, sans-serif")
+      .style("font-size", "0.8em")
+      .style("fill", m.color)
+      .text(m.label);
+  });
+
+  /* ── Caption ── */
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height - 20)
+    .attr("text-anchor", "middle")
+    .style("font-family", "Fira Sans, sans-serif")
+    .style("font-size", "1rem")
+    //.style("fill", "#888")
+    .style("font-style", "bold")
+    .text("Today, AI has become synonymous with deep learning");
+</script>
+</body>
+</html>

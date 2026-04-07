@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="d3.v7.min.js"></script>
+    <style>
+        body { display: flex; justify-content: center; align-items: start; min-height: 100vh; margin: 0; }
+    </style>
+</head>
+<body>
+<script>
+    const width  = 700;
+    const height = 400;
+ 
+    const svg = d3.select("body").append("svg")
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", [0, 0, width, height])
+        .style("display", "block")
+        .style("margin", "auto")
+        .style("font-family", "'Fira Sans', sans-serif");
+ 
+    /* ── Arrow markers ── */
+    const defs = svg.append("defs");
+
+    [   ["arrow-blue",  "#185FA5"],
+        ["arrow-green", "#3B6D11"],
+        ["arrow-gray",  "#888888"]
+    ].forEach(([id, color]) => {
+    defs.append("marker")
+        .attr("id", id)
+        .attr("viewBox", "0 0 10 10")
+        .attr("refX", 8).attr("refY", 5)
+        .attr("markerWidth", 6).attr("markerHeight", 6)
+        .attr("orient", "auto-start-reverse")
+        .append("path")
+        .attr("d", "M2 1L8 5L2 9")
+        .attr("fill", "none")
+        .attr("stroke", color)
+        .attr("stroke-width", 1.5)
+        .attr("stroke-linecap", "round")
+        .attr("stroke-linejoin", "round");
+    });
+ 
+    /* ── Layout constants ── */
+    const pad   = 15;
+    const cw    = width - 2 * pad;      /* container width  */
+    const bw    = 150;                  /* box width        */
+    const bh    = 50;                   /* box height       */
+    const gap   = (cw - 3 * bw) / 2;    /* gap between boxes */
+    const bx    = [pad, pad + bw + gap, pad + 2 * (bw + gap)]; /* box x positions */
+    const mid   = width / 2;            /* horizontal center */
+
+    /* training container */
+    const tc = { x: 5, y: 5, w: width - 10, h: bh + 50 };
+    /* inference container */
+    const ic = { x: 5, y: tc.y + tc.h + 50, w: width - 10, h: bh + 50 };
+
+    /* ── Helper: rounded box with title + subtitle ── */
+    function drawBox(parent, x, y, w, h, fill, stroke, title, sub) {
+        const g = parent.append("g");
+        g.append("rect")
+            .attr("x", x).attr("y", y)
+            .attr("width", w).attr("height", h)
+            .attr("rx", 8)
+            .attr("fill", fill)
+            .attr("stroke", stroke)
+            .attr("stroke-width", 0.7);
+        g.append("text")
+            .attr("x", x + w / 2)
+            .attr("y", sub ? y + h / 2 - 9 : y + h / 2)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .style("font-size", "13px")
+            .style("font-weight", "600")
+            .style("fill", fill === "#B5D4F4" ? "#0C447C" : "#27500A")
+            .text(title);
+        if (sub) {
+            g.append("text")
+            .attr("x", x + w / 2)
+            .attr("y", y + h / 2 + 10)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .style("font-size", "11px")
+            .style("fill", stroke)
+            .text(sub);
+        }
+    }
+ 
+    /* ── Helper: horizontal arrow ── */
+    function hArrow(parent, x1, y, x2, markerId, color, dashed = false) {
+        parent.append("line")
+            .attr("x1", x1).attr("y1", y)
+            .attr("x2", x2 - 2).attr("y2", y)
+            .attr("stroke", color)
+            .attr("stroke-width", 1.2)
+            .attr("marker-end", `url(#${markerId})`)
+            .attr("stroke-dasharray", dashed ? "5,5" : "none");
+    }
+ 
+  /* ══════════════════════════════
+     TRAINING PHASE
+  ══════════════════════════════ */
+    const train = svg.append("g");
+ 
+    train.append("rect")
+        .attr("x", tc.x).attr("y", tc.y)
+        .attr("width", tc.w).attr("height", tc.h)
+        .attr("rx", 12)
+        .attr("fill", "#E6F1FB")
+        .attr("stroke", "#185FA5")
+        .attr("stroke-width", 0.8);
+
+    train.append("text")
+        .attr("x", tc.x + 16).attr("y", tc.y + 22)
+        .style("font-size", "13px").style("font-weight", "600")
+        .style("fill", "#185FA5")
+        .text("Learning phase");
+
+    const by = tc.y + 40;
+
+    drawBox(train, bx[0], by, bw, bh, "#B5D4F4", "#185FA5", "Data", "inputs & outputs");
+    drawBox(train, bx[1], by, bw, bh, "#B5D4F4", "#185FA5", "Training", "model parameters optim.");
+    drawBox(train, bx[2], by, bw, bh, "#B5D4F4", "#185FA5", "Model", "learned function h");
+
+    hArrow(train, bx[0] + bw, by + bh / 2, bx[1], "arrow-blue", "#185FA5");
+    hArrow(train, bx[1] + bw, by + bh / 2, bx[2], "arrow-blue", "#185FA5");
+ 
+    /* ── Deploy arrow ── */
+    const deployY1 = tc.y + tc.h;
+    const deployY2 = ic.y;
+
+    svg.append("line")
+        .attr("x1", mid).attr("y1", deployY1)
+        .attr("x2", mid).attr("y2", deployY2 - 2)
+        .attr("stroke", "#888")
+        .attr("stroke-width", 1.2)
+        .attr("marker-end", "url(#arrow-gray)");
+
+    svg.append("text")
+        .attr("x", mid + 6).attr("y", (deployY1 + deployY2) / 2)
+        .attr("dominant-baseline", "central")
+        .style("font-size", "11px")
+        .style("fill", "#888")
+        .text("deploy");
+ 
+    /* ══════════════════════════════
+        INFERENCE PHASE
+    ══════════════════════════════ */
+    const infer = svg.append("g");
+
+    infer.append("rect")
+        .attr("x", ic.x).attr("y", ic.y)
+        .attr("width", ic.w).attr("height", ic.h)
+        .attr("rx", 12)
+        .attr("fill", "#EAF3DE")
+        .attr("stroke", "#3B6D11")
+        .attr("stroke-width", 0.8);
+
+    infer.append("text")
+        .attr("x", ic.x + 16).attr("y", ic.y + 22)
+        .style("font-size", "13px").style("font-weight", "600")
+        .style("fill", "#3B6D11")
+        .text("Inference phase");
+
+    const iby = ic.y + 40;
+
+    drawBox(infer, bx[0], iby, bw, bh, "#C0DD97", "#3B6D11", "New input",     "");
+    drawBox(infer, bx[1], iby, bw, bh, "#C0DD97", "#3B6D11", "Trained model", "");
+    drawBox(infer, bx[2], iby, bw, bh, "#C0DD97", "#3B6D11", "Output prediction",    "");
+
+    hArrow(infer, bx[0] + bw, iby + bh / 2, bx[1], "arrow-green", "#3B6D11");
+    hArrow(infer, bx[1] + bw, iby + bh / 2, bx[2], "arrow-green", "#3B6D11");
+
+
+    svg.append("line")
+        .attr("x1", bx[2] + bw / 2).attr("y1", by + bh)
+        .attr("x2", bx[1] + bw / 2).attr("y2", iby)
+        .attr("stroke", "#888")
+        .attr("stroke-width", 1.2)
+        .attr("marker-end", "url(#arrow-gray)")
+        .attr("stroke-dasharray", "5,5");
+ 
+</script>
+</body>
+</html>

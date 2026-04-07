@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>Journées des Écoles Doctorales MIIS et PSIME</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+	<link rel="stylesheet" href="reveal/dist/reset.css">
+    <link rel="stylesheet" href="reveal/dist/reveal.css">
+    <link rel="stylesheet" href="css/reveallitis.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!--------------------------------------------->
+            <!-- Cover slide -->
+            <section class="title-slide" data-background-image="assets/background.jpg" data-background-opacity="0.3">
+                <h1>Artificial Intelligence for Physical Sciences</h1>
+                <div class="author">Simon BERNARD (<a href="https://smnbrnrd.github.io" target="_blank">https://smnbrnrd.github.io</a>)</div>
+                <div class="institution">LITIS, Université de Rouen Normandie</div>
+                <div>
+                    <img src="assets/logos/logo_urn.png" class="logo" alt="logo_urn">
+                    <img src="assets/logos/logo_litis.png" class="logo" alt="logo_litis">
+                    <img src="assets/logos/logo_normastic.png" class="logo" alt="logo_normastic">
+                </div>
+            </section>
+
+            <!--------------------------------------------->
+            <section class="section-slide">
+                <div class="title">Today's artificial intelligence is deep learning</div>
+            </section>
+
+            <!--------------------------------------------->
+            <section>
+                <h1>AI: historical perspective</h1>
+                <div class="fig-container" data-file="assets/html/ai-timeline.html" 
+                        data-style="width:100%; align:center; height:100%" 
+                        style="height: 100%" data-preload 
+                        data-scroll="no" data-overflow-shown=true>
+                </div>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>Machine Learning</h1>
+                <h2>Learning to solve problems from data, without explicit programming</h2>
+                <div class="fig-container mt-4" data-file="assets/html/ml-pipeline.html" 
+                        data-style="width:100%; align:center; height:100%" 
+                        style="height: 40%; width: 70%; margin: 0 auto;" 
+                        data-preload data-scroll="no" data-overflow-shown=true>
+                </div>
+                <ol>
+                    <li><strong>Data</strong>: identify input $\mathbf{x} \in \mathcal{X}$, e.g. images, texts or $\mathcal{X} \subseteq \mathbb{R}^d$</li>
+                    <li><strong>Machine learning task</strong>: identify output $\mathbf{y} \in \mathcal{Y}$ s.t. $\mathbf{y} = f(\mathbf{x})$, e.g. <span class="important">$\mathcal{Y} \subseteq \mathbb{R}$ (regression)</span> or <span class="important">$\mathcal{Y} = \{1, 2, ..., K\}$ (classification)</span></li>
+                    <li><strong>Training</strong>: build a model $h$ from a training set <span class="important">$\mathcal{D} = \{\mathbf{x}_i\}_{i=1}^n$ (unsupervised)</span> or <span class="important">$\mathcal{D} = \{(\mathbf{x}_i, \mathbf{y}_i)\}_{i=1}^n$ (supervised) </span></li>
+                    <li><strong>Prediction</strong>: $\hat{y} = h(\mathbf{x}), \forall \mathbf{x} \in \mathcal{X}$</li>
+                </ol>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>Machine Learning</h1>
+                <h2>Training: finding parameters $\theta^{\star}$ that minimize the loss function</h2>
+                <div class="row mt-4">
+                    <div class="col-55">
+                    <ul>
+                        <li><strong class="important">Goal</strong><br>
+                            Find $h$ approximating $f$, based on a $\mathcal{D} = \{(\mathbf{x}_i, \mathbf{y}_i)\}_{i=1}^n$
+                        </li>
+                        <li><strong class="important">Parametric model</strong><br>
+                            $h$ defined by $p$ parameters $h(\cdot;\bm{\theta})$ with $\boldsymbol{\theta} \in \mathbb{R}^{p}$
+                        </li>
+                        <li><strong class="important">Loss function</strong><br>
+                            Choose (or define) a loss function $\ell : \mathcal{Y} \times \mathcal{Y} \to \mathbb{R}$ that penalizes "bad" $h$ candidates:
+                            \[
+                                \mathcal{L}(\bm{\theta}) = \dfrac{1}{n} \displaystyle\sum_{i=1}^{n} \ell\!\left(h(\mathbf{x}_i;\boldsymbol{\theta}),\, y_i\right)
+                            \]
+                            <span class="grey">e.g. mean squared error for regression, cross-entropy for classification</span>
+                        </li>
+                        <li><strong class="important">Training</strong><br>
+                            Use optimization tools to find $\boldsymbol{\theta}^*$ that minimize the loss function:
+                            \[
+                                \bm{\theta}^* = \underset{\boldsymbol{\theta}}{\arg\min}\ \mathcal{L}(\boldsymbol{\theta})
+                            \]
+                            <span class="grey">e.g. gradient descent (illustration on the right)</span>
+                        </li>
+                    </ul>
+
+                    </div>
+                    <div class="col-45 center">
+                        <img src="assets/images/gradientdescent.png" class="w-80 mt-4">
+                    </div>
+                </div>
+            </section>
+
+            <!--------------------------------------------->
+            <section>
+                <h1>Deep Neural Networks</h1>
+                <div class="row">
+                    <div class="col-45 center">
+                        <p class="important strong">Perceptron (Rosenblatt, 1957)</p>
+                        <ul>
+                            <li>Input/output: ${\color{mediumseagreen} \mathbf{x} \in \mathbb{R}^d}, {\color{salmon} y \in [0,1]}$</li>
+                            <li>$h_{\mathbf{w},b}(\mathbf{x}) = \hat{y} = \sigma(\mathbf{w}^\top \mathbf{x} + b)$</li>
+                            <li>$p = d+1$ parameters to learn</li>
+                            <li>Learning with stochastic gradient descent</li>
+                        </ul>
+                        <img src="assets/images/linearmodel.webp" class="w-80 mt-3">
+                    </div>
+                    <div class="col-50 center">
+                        <p class="important strong">Deep Neural Networks (Amari, 1967)</p>
+                        <ul>
+                            <li>2+ successive layers of neurons</li>
+                            <li>$p$ increases with the number of neurons</li>
+                            <li><span class="alert">The larger $p$, the more data is needed...</span></li>
+                            <li><span class="alert">...the more computationally expensive the training process</span></li>
+                        </ul>
+                        <img src="assets/images/neural_network.webp" class="w-80 mt-3">
+                    </div>
+                </div>
+            </section>
+
+            <!--------------------------------------------->
+            <section>
+                <h1>Deep Neural Networks</h1>
+                <h2>DNN are around for 60 years, so why is it working now?</h2>
+                <div class="row mt-3">
+                    <div class="col-50 center">
+                        <div class="mb-2 strong">Abundance of data</div>
+                        <img src="assets/images/imagenet.jpg" class="w-65">
+                    </div>
+                    <div class="col-50 center">
+                        <div class="mb-2 strong">Powerful computing devices (GPU)</div>
+                        <img src="assets/images/nvidia_a100.jpg" class="w-30"">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-50 center">
+                        <div class="mb-2 strong">Development of dedicated software</div>
+                        <img src="assets/images/software_logos.png" class="w-70">
+                    </div>
+                    <div class="col-50 center">
+                        <div class="mb-2 important strong">Representation Learning</div>
+                        <img src="assets/images/image_features.png" class="w-60">
+                    </div>
+                </div>
+            </section>
+
+            <!--------------------------------------------->
+            <section>
+                <h1>Example: representation learning for images/videos</h1>
+                <h2>Image/video analysis: <span class="important">Convolutional NN</span> + <span class="alert">regular NN</span></h2>
+                <figure class="center mt-4">
+                    <img src="assets/images/cnn_fidle.png" class="w-70">
+                    <figcaption class="right w-10">source: <a href="https://www.fidle.cnrs.fr">https://www.fidle.cnrs.fr</a></figcaption>
+                </figure>
+                <figure class="center mt-2">
+                    <img src="assets/images/object_tracking.gif" class="w-45">
+                    <figcaption>Tracking with DeepSORT (<a href="https://arxiv.org/abs/1703.07402">Wokje et al., 2017</a>) based on YOLO (<a href="https://arxiv.org/abs/1506.02640">Redmon et al., 2016</a>)</figcaption>
+                </figure>
+            </section>
+
+            <!--------------------------------------------->
+            <section>
+                <h1>Example: representation learning for images/videos</h1>
+                <h2>Image/video generation: <span class="alert">Encoder-decoder architecture</span> + <span class="important">adversarial or diffusion training</span></h2>
+                <figure class="center mt-4">
+                    <img src="assets/images/autoencoder.png" class="w-70">
+                    <figcaption class="right w-10">source: <a href="https://www.fidle.cnrs.fr">https://www.fidle.cnrs.fr</a></figcaption>
+                </figure>
+                <figure class="center mt-2">
+                    <img src="assets/images/tdpaint_diversity.png" class="w-45">
+                    <figcaption>TD-Paint (<a href="https://openreview.net/forum?id=erWwBoR59l">Mayet et al., 2025</a>): <span class="em">Inpainting</span> with diffusion models (<a href="https://arxiv.org/abs/2006.11239">Ho et al. 2020</a>) using a U-Net (<a href="https://arxiv.org/abs/1505.04597">Ronneberger et al., 2015</a>) as <span class="em">backbone</span></figcaption>
+                </figure>
+            </section>
+
+            <!--------------------------------------------->
+            <section>
+                <h1>Example: representation learning for texts</h1>
+                <h2>Text understanding and generation: <span class="alert">Encoder-decoder architecture</span> + <span class="important">attention mechanism</span></h2>
+                <div class="row mt-4">
+                    <div class="col-50">
+                        <figure class="center">
+                            <img src="assets/images/attention_is_all_you_need.png" class="w-70">
+                            <figcaption>Transformer architecture (<a href="https://arxiv.org/abs/1706.03762" target="_blank">Vaswani et al., 2017</a>)</figcaption>
+                        </figure>
+                    </div>
+                    <div class="col-50">
+                        <p class="strong">Large Language Models (LLMs):</p>
+                        <ul>
+                            <li>Trained on large corpora of text data</li>
+                            <li>Can generate coherent and contextually relevant text</li>
+                            <li>Chatbots, content generation, code generation, etc.</li>
+                        </ul>
+                        <figure class="mt-5">
+                            <img src="assets/logos/gemini_logo.png" class="h-2em m-2">
+                            <img src="assets/logos/claude_logo.png" class="h-2em m-2">
+                            <img src="assets/logos/copilot_logo.png" class="h-2em m-2">
+                            <img src="assets/logos/mistral_logo.png" class="h-2em m-2">
+                            <img src="assets/logos/chatgpt_logo.png" class="h-2em m-2">
+                            <img src="assets/logos/llama_logo.png" class="h-2em m-2">
+                            <img src="assets/logos/qwen-logo.png" class="h-2em m-2">
+                            <img src="assets/logos/deepseek-logo.png" class="h-2em m-2">
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!--------------------------------------------->
+            <section class="section-slide">
+                <div class="title">Artificial Intelligence for Sciences</div>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>AI for Sciences</h1>
+                <div class="row mt-4">
+                    <div class="col-50">
+                        <figure class="center">
+                            <img src="assets/images/ia4science_nature.webp" class="w-85">
+							<figcaption class="mt-2">source: Wang et al, "Scientific discovery in the age of artificial intelligence", Nature (2023)</figcaption>
+                        </figure>
+                    </div>
+                    <div class="col-50 pl-3">
+                        <p class="important">Major successes of AI: digital applications</p>
+                        <ul>
+                            <li>Images, videos, texts, video games, etc.</li>
+                            <li>Massively available data</li>
+                        </ul>
+                        <p class="important">What about sciences and engineering? Can we use AI to:</p>
+                        <ul>
+                            <li>be a better alternative to traditional approaches?</li>
+                            <li>solve problems more effectively?</li>
+                            <li>accelerate scientific discovery?</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>AI for Sciences: notable recent works</h1>
+                <h2>Weather forecasting</h2>
+                <div class="row">
+                    <div class="col-50">
+                        <ul>
+                            <li class="important strong">GraphCast (Google DeepMind, 2023)</li>
+                            <li>Deep learning model:</li>
+                            <ul>
+                                <li>Training data: 40 years of observations (ECMWF)</li>
+                                <li>Big representation learning model (right)</li>
+                                <li>Huge computational resources</li>
+                            </ul>
+                        </ul>
+                        <figure class="mt-4">
+                            <img src="assets/images/graphcast.gif" class="w-95" alt="graphcast">
+                        </figure>
+                    </div>
+                    <div class="col-50">
+                        <figure>
+                            <img src="assets/images/graphcast.png" class="w-95" alt="graphcastmodel">
+                            <figcaption>source: <a href="https://deepmind.google/blog/graphcast-ai-model-for-faster-and-more-accurate-global-weather-forecasting/" target="_blank">https://deepmind.google/blog/graphcast-ai-model-for-faster-and-more-accurate-global-weather-forecasting/</a></figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>AI for Sciences: notable recent works</h1>
+                <h2>Nuclear fusion for sustainable energy production</h2>
+                <ul>
+                    <li>High-performance, clean and virtually inexhaustible energy (natural fuel, high efficiency)</li>
+                    <li>Experimental, as it is very difficult to control due to the unstable state of the plasma used for fusion</li>
+                    <li class="important strong">AI for modeling and controlling the plasma in fusion reactors:</li>
+                    <ul>
+                        <li>Based on reinforcement learning</li>
+                        <li>Simulated data and control policy that require significant domain expertise</li>
+                    </ul>
+                </ul>
+                <figure class="mt-4 center">
+                    <img src="assets/images/nuclear-fusion-controled-by-ai3.webp" class="w-45">
+                    <img src="assets/images/nuclear-fusion-controled-by-ai.gif" class="w-50">
+                    <figcaption>Degrave et al., "Magnetic control of tokamak plasmas through deep reinforcement learning", Nature, 2023</figcaption>
+                </figure>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>AI for Sciences: notable recent works</h1>
+                <h2>Protein structure prediction</h2>
+                <div class="row">
+                    <div class="col-70">
+                        <ul>
+                            <li class="important strong">AlphaFold 2 (Google DeepMind, 2021)</li>
+                            <li>Trained on 200k+ known structures, predictions for almost all known proteins (&sim; 200M)</li>
+                            <li>Deep learning model <span class="important">inspired by LLMs</span> and with an iterative generation approach</li>
+                        </ul>
+                        <figure class="mt-3">
+                            <video class="w-100" loop controls preload="auto" autoplay>
+                                <source src="assets/images/alphafold.mp4" type="video/mp4">
+                            </video>
+                        </figure>
+                    </div>
+                    <div class="col-30">
+                        <figure>
+                            <img src="assets/images/alphafold-nature.png" class="w-100">
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>AI for Sciences</h1>
+                <div class="row">
+                    <div class="col-50">
+                        <p class="important">Main challenges:</p>
+                        <ul>
+                            <li>Need for a large amount of labeled data</li>
+                            <li>Interpretability & uncertainty quantification</li>
+                            <li>Poor out-of-distribution generalization</li>
+                            <li>Physical/biological constraints must be satisfied</li>
+                        </ul>
+                        <p class="important">Contradictory to the scientific approach:</p>
+                        <ul>
+                            <li>Based on theory and experiments</li>
+                            <li>Must be interpretable and explainable</li>
+                            <li>Must allow for reliable predictions on new cases</li>
+                            <li>Must be consistent with scientific knowledge</li>
+                        </ul>
+                    </div>
+                    <div class="col-50 center">
+                        <p class="important">Solution</p>
+                        <figure>
+                            <img src="assets/images/sciml.png" class="w-75">
+                            <figcaption>source: S. Mishra, B. Mosley, ETH Zürich, <a href="https://camlab.ethz.ch/teaching/ai-in-the-sciences-and-engineering-2024.html" target="_blank">"AI in the Sciences and Engineering"</a> (2024)</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>Computational Fluid Dynamics as a case study</h1>
+                <h2>Partial Differential Equations are building blocks of science</h2>
+                <ul>
+                    <li>Partial derivative of a function $u(x_1, \ldots, x_n) : \mathbb{R}^n \to \mathbb{R}$:
+                    $$
+                        \frac{\partial u}{\partial x_i} = \lim_{\Delta x_i \to 0} \frac{u(x_1, \ldots, x_i + \Delta x_i, \ldots, x_n) - u(x_1, \ldots, x_i, \ldots, x_n)}{\Delta x_i}
+                    $$
+                    i.e. <span class="important">the magnitude of variation of $u$ with respect to a small change in $x_i$</span></li>
+                    <li>Partial Differential Equations:</li>
+                    $$
+                        F\left(x_1, \ldots, x_n, u, \frac{\partial u}{\partial x_1}, \ldots, \frac{\partial u}{\partial x_n}, \frac{\partial^2 u}{\partial x_1^2}, \frac{\partial^2 u}{\partial x_1 \partial x_2}, \ldots \right) = 0
+                    $$
+                    <li class="important">To model physical phenomena (mechanics, electromagnetism, acoustics, thermodynamics), chemical (reaction kinetics), or biological (population dynamics) processes</li>
+                    <li>Example: Navier-Stokes equations for fluid flow<br>
+                    \[
+                        \begin{cases}
+                            \dfrac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} = -\nabla p + \nu \nabla^2 \mathbf{u} + \mathbf{f} & \text{(momentum equation)}\\
+                            \nabla \cdot \mathbf{u} = 0 & \text{(incompressibility condition)}
+                        \end{cases}
+                    \]
+                    with $\mathbf{u}$ the velocity field, $p$ the pressure, $\nu$ the kinematic viscosity and $\mathbf{f}$ the external forces
+                    </li>
+                </ul>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>Computational Fluid Dynamics as a case study</h1>
+                <p>Governing equations:
+                \[
+                    \begin{cases}
+                        \dfrac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} = -\nabla p + \nu \nabla^2 \mathbf{u} + \mathbf{f} & \text{(momentum equation)}\\
+                        \nabla \cdot \mathbf{u} = 0 & \text{(incompressibility condition)}
+                    \end{cases}
+                \]
+                with $\mathbf{u}$ the velocity field, $p$ the pressure, $\nu$ the kinematic viscosity and $\mathbf{f}$ the external forces</p>
+                <div class="row mt-4">
+                    <div class="col-50">
+                        <ul>
+                            <li>Traditional solvers based on numerical methods</li>
+                            <li><span class="important">Limitations: high computational cost</span><br>
+                            Can takes weeks of HPC time for a single simulation
+                            </li>
+                            <li><span class="important">One simulation per configuration:</span></li>
+                            <ul>
+                                <li>Initial conditions</li>
+                                <li>Boundary conditions</li>
+                                <li>Physical parameters (e.g. viscosity)</li>
+                            </ul>
+                            <li class="important">Faster and more versatile solvers using machine learning?</li>
+                        </ul>
+                    </div>
+                    <div class="col-50 center">
+                        <figure>
+                            <img src="assets/images/navier-stokes-initialconditions.gif" class="w-100 framed">
+                            <figcaption>source: Zongyi LI (<a href="https://zongyi-li.github.io/neural-operator/" target="_blank">https://zongyi-li.github.io/neural-operator/</a>)</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!--------------------------------------------->
+            <section class="section-slide">
+                <div class="title">Machine learning for PDE solving</div>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>Scientific Machine Learning taxonomy</h1>
+                <div class="row mt-4">
+                    <div class="col-32">
+                        <p class="important strong">1. ML into scientific pipelines</p>
+                        <p class="grey">Incorporate ML models into scientific pipelines, e.g. use ML to accelerate or improve traditional numerical methods</p>
+                        <figure class="mt-4 p-2 center">
+                            <img src="assets/images/sciml_approach3.png" class="w-100 mt-4">
+                        </figure>
+                    </div>
+                    <div class="col-32">
+                        <p class="important strong">2. Scientific knowledge into ML process</p>
+                        <p class="grey">Incorporate scientific knowledge into the learning process, e.g. add physical constraints to the loss function</p>
+                        <figure class="mt-4 p-2 center">
+                            <img src="assets/images/sciml_approach1.png" class="w-75 mt-4">
+                        </figure>
+                    </div>
+                    <div class="col-32">
+                        <p class="important strong">3. Architectural modifications</p>
+                        <p class="grey">Modify architectures to respect scientific principles, e.g. replace NN building blocks with physical operators</p>
+                        <figure class="mt-4 p-2 center">
+                            <img src="assets/images/sciml_approach2.png" class="w-80 mt-4">
+                        </figure>
+                    </div>
+                </div>
+                <figure class="center"><figcaption>source: S. Mishra, B. Mosley, ETH Zürich, <a href="https://camlab.ethz.ch/teaching/ai-in-the-sciences-and-engineering-2024.html" target="_blank">"AI in the Sciences and Engineering"</a> (2024)</figcaption></figure>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>1. ML models into scientific pipelines</h1>
+                <div class="row">
+                    <div class="col-80 mt-3">
+                        <p class="important strong">Key idea: replace part of numerical solvers with ML models</p>
+                        <ul>
+                            <li>Examples:</li>
+                            <ul>
+                                <li><span class="important">Neural Ordinary Differential Equations</span> (Chen et al., NeurIPS, 2018)<br>
+                                $$
+                                    \dfrac{d\mathbf{z}(t)}{dt} = NN(\mathbf{z}(t), t; \boldsymbol{\theta})
+                                $$
+                                with $\mathbf{z}(t)$ the state of the system at time $t$, $NN$ a neural network and $\boldsymbol{\theta}$ the parameters to learn
+                                </li>
+                                <li>ML models for upscaling simulations (<a href="https://proceedings.neurips.cc/paper_files/paper/2020/file/43e4e6a6f341e00671e123714de019a8-Paper.pdf" target="_blank">Um et al., 2020</a>, <a href="https://proceedings.mlr.press/v119/de-avila-belbute-peres20a/de-avila-belbute-peres20a.pdf" target="_blank">Belbute-Peres et al., 2020</a>)</li>
+                                <li>ML-accelerated solvers, e.g. with learned preconditionners (<a href="https://arxiv.org/pdf/2310.00177" target="_blank">Lan et al. 2024</a>)</li>
+                                <li>ML-assisted discretizations, e.g. by learning subgrid-scaled models (<a href="https://arxiv.org/abs/2212.09967" target="_blank">Kang et al., 2023</a>)</li>
+                                <li>Hamiltonian Neural Networks (<a href="https://proceedings.neurips.cc/paper_files/paper/2019/file/26cd8ecadce0d4efd6cc8a8725cbd1f8-Paper.pdf" target="_blank">Greydanus et al., 2020</a>)</li>
+                            </ul>
+                        </ul>
+                    </div>
+                    <div class="col-20"><figure><img src="assets/images/sciml_approach3.png" class="w-100"></figure></div>
+                </div>
+                <p class="em">We will not go into further detail about this approach in this presentation.</p>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>2. Scientific knowledge into the learning process</h1>
+                <div class="row">
+                    <div class="col-85 mt-3">
+                        <p class="important strong">Key idea: incorporate domain-specific knowledge into the training process of ML models</p>
+                        <ul>
+                            <li>Typically, the loss function is decomposed into two terms:
+                            \[
+                                \mathcal{L}(\boldsymbol{\theta}) = \mathcal{L}_{data}(\boldsymbol{\theta}) + \lambda \mathcal{L}_{physics}(\boldsymbol{\theta})
+                            \]
+                            where $\mathcal{L}_{data}$ is the data-driven loss, $\mathcal{L}_{physics}$ is the physics-driven loss</li>
+                            <li class="mt-3">Examples:</li>
+                            <ul>
+                                <li><span class="important">Physics-Informed Neural Networks</span> (details to follow)</li>
+                                <li>Physical constraints to enforce conservation laws (<a href="https://proceedings.mlr.press/v202/hansen23b/hansen23b.pdf" target="_blank">Hennigh et al., 2020</a>)</li>
+                                <li>Physics-based constraints for moving boundary conditions (<a href="https://arxiv.org/abs/2306.13395" target="_blank">Sundar et al., 2023</a>)</li>
+                                <li>Multiple physics-based constraints with self-adaptive weighting (<a href="https://arxiv.org/abs/2407.01613" target="_blank">Chen et al., 2024</a>)</li>
+                            </ul>
+                        </ul>
+                    </div>
+                    <div class="col-15"><figure><img src="assets/images/sciml_approach1.png" class="w-100"></figure></div>
+                </div>
+                
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>2. Scientific knowledge into the learning process</h1>
+                <div class="row">
+                    <div class="col-85 mt-3">
+                        <p class="important strong">Physics-Informed Neural Network (<a href="https://maziarraissi.github.io/PINNs/">Raissi et al., 2019</a>)</p>
+                        <ul>
+                            <li>We know the PDE but have limited number of data points (e.g. initial and boundary conditions)</li>
+                            <li>Example: Burgers' equation
+                            $$
+                                \frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} - \nu \frac{\partial^2 u}{\partial x^2} = 0
+                            $$
+                            </li>
+                            <li>Marked points (X) are training points (initial and boundary conditions)</li>
+                        </ul>
+                    </div>
+                    <div class="col-15"><figure><img src="assets/images/sciml_approach1.png" class="w-100"></figure></div>
+                </div>
+                <figure class="center"><img src="assets/images/burgers_illu.png" class="w-45"></figure>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>2. Scientific knowledge into the learning process</h1>
+                <div class="row">
+                    <div class="col-85 mt-3">
+                        <p class="important strong">Physics-Informed Neural Network (<a href="https://maziarraissi.github.io/PINNs/">Raissi et al., 2019</a>)</p>
+                        <ul>
+                            <li>The NN is given time and space coordinates $(x,t)$ as inputs and is trained to predict $u(x,t)$</li>
+                            <li>Loss function:
+                            \[
+                                \mathcal{L}(\boldsymbol{\theta}) = \underbrace{\dfrac{1}{N_u} \sum_{i=1}^{N_u} |u(x_u^i, t_u^i) - u^i|^2}_{\text{data-driven loss}} + \lambda \underbrace{\dfrac{1}{N_f} \sum_{i=1}^{N_f} |f(x_f^i, t_f^i)|^2}_{\text{physics-driven loss}}
+                            \]
+                            where $f(x,t)$ is the PDE residual</li>
+                        </ul>
+                    </div>
+                    <div class="col-15"><figure><img src="assets/images/sciml_approach1.png" class="w-100"></figure></div>
+                </div>
+                <div class="row center">
+                    <div class="col-60 p-3">
+                        <figure class="center"><img src="assets/images/pinn.png" class="w-100"></figure>
+                        <figcaption>source: <a href="https://benmoseley.blog/my-research/so-what-is-a-physics-informed-neural-network/">https://benmoseley.blog/my-research/so-what-is-a-physics-informed-neural-network/</a></figcaption>
+                    </div>
+                    <div class="col-40">
+                        <p class="small mt-5">Note:</p>
+                        <ul class="small">
+                            <li>Training points used for computing the data-driven term</li>
+                            <li>Collocation points sampled from the domain for computing the physics-driven term</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>3. Architectural modifications</h1>
+                <div class="row">
+                    <div class="col-85 mt-3">
+                        <p class="important strong">Key idea: modify the architecture of ML models to respect scientific principles</p>
+                        <ul>
+                            <li>Most representative approaches are Neural Operators</li>
+                            <li>Let $\mathcal{A}$ and $\mathcal{U}$ denote the spaces of input and output functions, respectively</li>
+                            <li>NO learn a mapping $\mathcal{G} : \mathcal{A} \to \mathcal{U}$ that respects the underlying physics</li>
+                        </ul>
+                    </div>
+                    <div class="col-15"><figure><img src="assets/images/sciml_approach2.png" class="w-100"></figure></div>
+                </div>
+                <p class="mt-2 mb-0">General idea:</p>
+                <ul class="mt-0">
+                    <li>DL architectures are designed to learn mappings between input and output vector spaces:</li>
+                    <figure class="center">
+                        <img src="assets/images/function_learning.png" class="w-45">
+                    </figure>
+                    $$
+                        \mathbf{y} = \sigma(\mathbf{W} \mathbf{x} + \mathbf{b})
+                    $$
+                    <li>We need architectures that can learn mappings between function spaces:</li>
+                    <figure class="center">
+                        <img src="assets/images/operator_learning.png" class="w-45">
+                    </figure>
+                    $$ 
+                        u(\mathbf{s}) = \sigma \left( \int \kappa(\mathbf{s},\mathbf{y}) a(\mathbf{y}) d\mathbf{y}) + \mathbf{W}a(\mathbf{s}) \right)
+                    $$
+                </ul>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>3. Architectural modifications</h1>
+                <div class="row">
+                    <div class="col-85 mt-3">
+                        <p class="important strong">Fourier Neural Operator (<a href="https://openreview.net/forum?id=c8P9NQVtmnO">Li et al., 2021</a>)</p>
+                        <ul>
+                            <li>$a : \Omega \to \mathbb{R}^m$, $u : \Omega \to \mathbb{R}^n$ and $\Omega \subset \mathbb{R}^d$ a bounded space</li>
+                            <li>The integral operator is approximated using the Fourier transform</li>
+                            <li>$R$ allows to filter the fourier modes: model dynamic at different scales</li>
+                            <li>$W$ captures local informations and non-periodic boundary conditions</li>
+                            <li>FFT operates on regular grids but can operate on different resolution as the one in training</li>
+                        </ul>
+                    </div>
+                    <div class="col-15"><figure><img src="assets/images/sciml_approach2.png" class="w-100"></figure></div>
+                </div>
+                <figure class="center mt-3">
+                    <img src="assets/images/fno_full.png" class="w-70">
+                    <figcaption>source: Li et al., 2020 (<a href="https://zongyi-li.github.io/blog/2020/fourier-pde/" target="_blank">https://zongyi-li.github.io/blog/2020/fourier-pde/</a>)</figcaption>
+                </figure>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>Fifty shades of Neural Operators</h1>
+                <figure class="center">
+                    <img src="assets/images/dl4cfd_jungle.png" class="w-50">
+                    <figcaption><a href="https://arxiv.org/pdf/2408.12171" target="_blank">Wang et al. ,"Recent Advances on Machine Learning for Computational Fluid Dynamics: A Survey", 2025</a></figcaption>
+                </figure>
+            </section>
+
+            <!--------------------------------------------->
+            <section class="section-slide">
+                <div class="title">Discussion</div>
+            </section>
+
+            <!------------------------------------------------------>
+            <section>
+                <h1>AI4Science</h1>
+                <h2>Very active research area since &sim;2020</h2>
+                <div class="row mt-3">
+                    <div class="col-50 center">
+                        <figure class="mt-4">
+                            <img src="assets/images/ai4science_papers.png" class="w-90">
+                            <figcaption>source: Ben Blaiszik, <a href="https://github.com/blaiszik/ml_publication_charts/tree/master" target="_blank">https://github.com/blaiszik/ml_publication_charts/</a></figcaption>
+                        </figure>
+                    </div>
+                    <div class="col-50 center">
+                        <figure class="mt-4">
+                            <img src="assets/images/ai4science_conf.png" class="w-80">
+                            <figcaption>source: S. Mishra, B. Mosley, ETH Zürich, <a href="https://camlab.ethz.ch/teaching/ai-in-the-sciences-and-engineering-2024.html" target="_blank">"AI in the Sciences and Engineering"</a> (2024)</figcaption>
+                        </figure>
+                    </div>
+                </div>
+                <ul>
+                    <li>This talk is just a partial view of the domain</li>
+                    <li>Fast expanding topics, involving multiple communities</li>
+                </ul>
+            </section>
+            <!------------------------------------------------------>
+            <section>
+                <h1>Takeaways</h1>
+                <div class="boxtitle">Using machine learning</div>
+                <div class="boxcontent">
+                    <ul>
+                        <li>Know your data</li>
+                        <li>Define the machine learning task</li>
+                        <li>Choose the right model with the right representation learning blocks</li>
+                    </ul>
+                </div>
+                <div class="boxtitle">ML for science</div>
+                <div class="boxcontent">
+                    <ul>
+                        <li>Integrate domain knowledge into ML models</li>
+                        <li>Modern approach (neural operators) are promising for challenging scientific problems</li>
+                        <li>But no need to use a sledgehammer to crack a nut!</li>
+                    </ul>
+                </div>
+                <div class="boxtitle">Limitations</div>
+                <div class="boxcontent">
+                    <ul>
+                        <li>NO and co.  are promising but not always better than traditional approaches</li>
+                        <li>Model interpretability and uncertainty quantification</li>
+                        <li>Out-of-distribution generalization is still a challenge</li>
+                        <li>Computational cost and scalability</li>
+                    </ul>
+                </div>
+            </section>
+                
+
+        </div>
+    </div>
+
+    <script src="reveal/dist/reveal.js"></script>
+    <script src="reveal/plugin/notes/notes.js"></script>
+    <script src="reveal/plugin/reveald3.js"></script>
+	<script src="reveal/plugin/math/math.js"></script>
+    <script src="reveal/plugin/zoom/zoom.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1000, height: 700, margin: 0.05, hash: true, controls: false, slideNumber: 'c/t',
+            showSlideNumber: 'all', mouseWheel: true, transition: 'none', progress: true, autoPlayMedia: true,
+            plugins: [ RevealNotes, Reveald3, RevealZoom, RevealMath.KaTeX ]
+        });
+    </script>
+</body>
+</html>
